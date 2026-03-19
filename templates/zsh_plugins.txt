@@ -1,0 +1,20 @@
+# Completions (must load before compinit)
+zsh-users/zsh-completions kind:fpath path:src
+
+# fzf-tab (must load after compinit, before other plugins)
+# Commented out by default — learn fzf basics (Ctrl-R, Ctrl-T) first.
+# Uncomment when ready for fuzzy tab completion:
+# Aloxaf/fzf-tab
+
+# Core plugins
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-history-substring-search
+
+# Alias reminder
+MichaelAqwortas/zsh-you-should-use
+
+# Sudo snippet (double-ESC)
+ohmyzsh/ohmyzsh path:plugins/sudo
+
+# Syntax highlighting (MUST be last)
+zdharma-continuum/fast-syntax-highlighting
