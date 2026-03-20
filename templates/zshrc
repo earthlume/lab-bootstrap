@@ -13,8 +13,12 @@ fi
 source "${ZDOTDIR:-$HOME}/.antidote/antidote.zsh"
 antidote load
 
-# ----- Starship prompt -----
-eval "$(starship init zsh)"
+# ----- Prompt (Starship or fallback) -----
+if command -v starship &>/dev/null; then
+    eval "$(starship init zsh)"
+else
+    source ~/.config/zsh/prompt-fallback.zsh
+fi
 
 # ----- Zoxide (smart cd) -----
 if command -v zoxide &>/dev/null; then
