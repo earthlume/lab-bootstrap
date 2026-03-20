@@ -3,15 +3,22 @@
 # Local additions: put them in ~/.zshrc.local
 
 # ----- Modern replacements -----
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -la --icons --group-directories-first --git'
-alias lt='eza -la --icons --tree --level=2'
+# Guarded aliases for tools that may not exist on ARMv6 (no GitHub binaries)
+if command -v eza &>/dev/null; then
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza -la --icons --group-directories-first --git'
+    alias lt='eza -la --icons --tree --level=2'
+fi
+
 alias cat='bat'
 alias catp='bat -pp'      # plain mode, no paging — use when piping or for cat-like behavior
 alias grep='rg'
 alias find='fd'
-# dust is not available on armhf — use \du to get the real du if this errors
-alias du='dust'
+
+if command -v dust &>/dev/null; then
+    alias du='dust'
+fi
+
 alias top='btop'
 alias df='duf'
 

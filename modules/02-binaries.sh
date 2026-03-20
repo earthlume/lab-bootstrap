@@ -3,6 +3,13 @@
 
 log_step "Installing prebuilt binaries"
 
+# ARMv6 (Pi Zero/1) cannot execute GitHub-hosted armhf binaries (they target ARMv7+)
+if [[ "$IS_ARMV6" == true ]]; then
+    log_info "ARMv6 detected — skipping all GitHub binary installs"
+    # return works when sourced (normal path); exit covers standalone execution
+    return 0 2>/dev/null || exit 0
+fi
+
 TMPDIR="$(mktemp -d)"
 trap "rm -rf '$TMPDIR'" RETURN
 
@@ -105,5 +112,3 @@ install_eza || true
 install_zoxide || true
 install_delta || true
 install_dust || true
-
-rm -rf "$TMPDIR"

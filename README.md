@@ -28,12 +28,12 @@ Sets up a modern CLI environment — ZSH with plugins, Starship prompt, and a cu
 
 ### Prebuilt Binaries (architecture-aware)
 
-| Tool | Purpose | x86_64 | aarch64 | armhf |
-|------|---------|:------:|:-------:|:-----:|
-| [eza](https://github.com/eza-community/eza) | Modern `ls` | Yes | Yes | Yes |
-| [zoxide](https://github.com/ajeetdsouza/zoxide) | Smart `cd` | Yes | Yes | Yes |
-| [delta](https://github.com/dandavison/delta) | Git pager | Yes | Yes | Yes |
-| [dust](https://github.com/bootandy/dust) | Disk usage | Yes | Yes | — |
+| Tool | Purpose | x86_64 | aarch64 | armhf v7 (Pi 3) | armhf v6 (Pi Zero) |
+|------|---------|:------:|:-------:|:----------------:|:------------------:|
+| [eza](https://github.com/eza-community/eza) | Modern `ls` | ✅ | ✅ | ✅ | ❌ |
+| [zoxide](https://github.com/ajeetdsouza/zoxide) | Smart `cd` | ✅ | ✅ | ✅ | ❌ |
+| [delta](https://github.com/dandavison/delta) | Git pager | ✅ | ✅ | ✅ | ❌ |
+| [dust](https://github.com/bootandy/dust) | Disk usage | ✅ | ✅ | — | ❌ |
 
 ### Shell Setup
 
@@ -49,27 +49,54 @@ Sets up a modern CLI environment — ZSH with plugins, Starship prompt, and a cu
 - **Git:** identity configured (`earthlume`), delta as pager with side-by-side diffs
 - **MOTD:** branded login banner with live system info (hostname, OS, uptime, IP, CPU, memory, disk)
 
-## Architecture Support
+## Architecture & Platform Support
 
-Tested across the lab.hoens.fun fleet:
+The bootstrapper auto-detects CPU architecture (including ARM sub-version via `/proc/cpuinfo`) and available RAM. ARMv6 devices like the Pi Zero and Pi 1 are first-class targets with a gracefully reduced feature set.
+
+### Compatibility Matrix
+
+| Feature | x86_64 | aarch64 (Pi 4/5) | armhf v7 (Pi 3) | armhf v6 (Pi Zero/1) |
+|---------|:------:|:-----------------:|:----------------:|:--------------------:|
+| Apt tools (bat, rg, fd, fzf, btop, duf) | ✅ | ✅ | ✅ | ✅ |
+| GitHub binaries (eza, zoxide, delta) | ✅ | ✅ | ✅ | ❌ |
+| dust | ✅ | ✅ | ❌ | ❌ |
+| Starship prompt | ✅ | ✅ | ✅ | ❌ (fallback) |
+| ZSH + Antidote plugins | ✅ | ✅ | ✅ | ✅ |
+
+### ARMv6 Behavior (Pi Zero / Pi 1)
+
+On ARMv6 devices, the bootstrapper automatically:
+
+- **Skips all GitHub-hosted binaries** — the `armhf` builds published on GitHub target ARMv7 minimum and will not execute on ARMv6
+- **Skips Starship** — no ARMv6 build exists. A **pure Zsh fallback prompt** is deployed instead, with teal accents, `vcs_info` git branch display, and SSH-only hostname — same look, zero dependencies
+- **Guards aliases** — `ls`→`eza` and `du`→`dust` aliases are wrapped in `command -v` checks so they silently degrade to system defaults when the tools aren't present
+
+All apt-installed tools (bat, ripgrep, fd, fzf, btop, duf, tealdeer) work on ARMv6.
+
+### Low RAM Detection (≤512 MB)
+
+The bootstrapper detects total system RAM from `/proc/meminfo` and sets an `IS_LOW_RAM` flag when the device has 512 MB or less. A warning is emitted at startup for operator visibility.
+
+### Tested Platforms
 
 | Architecture | OS | Example Hosts |
 |-------------|-----|---------------|
 | x86_64 | Ubuntu 24.04 LTS | Workstations, VMs |
 | aarch64 | Raspberry Pi OS (Bookworm) | Pi 4, Pi 5 |
-| armhf | Raspberry Pi OS (Bookworm) | Pi 2B (1GB) |
+| armhf v7 | Raspberry Pi OS (Bookworm) | Pi 3 |
+| armhf v6 | Raspberry Pi OS (Bookworm) | Pi Zero, Pi 1 |
 
 ## Module Order
 
 | # | Module | What It Does |
 |---|--------|-------------|
 | 01 | packages | `apt update` + install base packages and modern CLI tools |
-| 02 | binaries | Download eza, zoxide, delta, dust from GitHub releases |
+| 02 | binaries | Download eza, zoxide, delta, dust from GitHub releases (skipped on ARMv6) |
 | 03 | zsh | Install Antidote, deploy plugins, `chsh` to zsh |
-| 04 | starship | Install Starship, deploy prompt config |
+| 04 | starship | Install Starship + config, or deploy fallback prompt on ARMv6 |
 | 05 | shell-config | Deploy `.zshrc`, aliases, create `bat`/`fd` symlinks |
 | 06 | ssh | Generate ed25519 keypair, configure git identity + delta |
-| 07 | motd | Deploy branded MOTD with live system stats |
+| 07 | motd | Deploy branded MOTD with live system stats (OS-aware strategy) |
 | 08 | cleanup | `apt autoremove`, print summary, show SSH pubkey |
 
 ## Repo Structure
@@ -80,6 +107,8 @@ lab-bootstrap/
 ├── main.sh               # sources lib/, runs modules in order
 ├── modules/              # numbered modules, executed sequentially
 ├── templates/            # config files deployed to the system
+│   ├── prompt-fallback.zsh   # pure Zsh prompt for ARMv6 (no Starship)
+│   └── ...
 ├── lib/                  # shared functions (logging, detection, helpers)
 ├── LICENSE               # MIT
 └── README.md
