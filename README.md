@@ -49,6 +49,22 @@ Sets up a modern CLI environment — ZSH with plugins, Starship prompt, and a cu
 - **Git:** identity configured (`earthlume`), delta as pager with side-by-side diffs
 - **MOTD:** branded login banner with live system info (hostname, OS, uptime, IP, CPU, memory, disk)
 
+## Design Philosophy
+
+Every default in this setup externalizes something — a decision, a command you'd have to remember, a sequence you'd have to repeat. The shell remembers so you don't have to. Roughly one in ten professional developers report ADHD or concentration difficulties, and those developers build compensatory systems instinctively: automated tests, linters, aliases, scripts that eliminate repetition. This bootstrapper is that instinct made explicit. But like curb cuts on sidewalks — designed for wheelchairs, used by everyone — these patterns just produce better developer experience regardless of how your brain works.
+
+| Pattern | What it looks like here |
+|---------|------------------------|
+| External memory | Aliases (`gs`, `ll`, `..`), shared history across terminals, git shortcuts |
+| Reduced activation energy | One-command install, `AUTO_CD`, zoxide frecency, `catp` plain mode |
+| Recognition over recall | Autosuggestions, history substring search (arrow keys) |
+| Fuzzy over exact | fzf Ctrl-R / Ctrl-T — partial recall beats perfect recall |
+| Visual anchoring | eza `--icons`, bat syntax highlighting, Starship color-coded prompt |
+| Fast feedback | Instant prompt (cached compinit <50ms), async autosuggestions |
+| Graceful degradation | ARMv6 fallback prompt, guarded aliases, idempotent re-runs |
+
+None of this requires opt-in. It's the default — because good defaults are the whole point.
+
 ## Architecture & Platform Support
 
 The bootstrapper auto-detects CPU architecture (including ARM sub-version via `/proc/cpuinfo`) and available RAM. ARMv6 devices like the Pi Zero and Pi 1 are first-class targets with a gracefully reduced feature set.
