@@ -7,7 +7,15 @@ MOTD_SCRIPT="$SCRIPT_DIR/templates/motd"
 
 case "$OS_ID" in
     ubuntu)
-        # Ubuntu: append to the update-motd.d pipeline — preserve default scripts
+        # Ubuntu: disable default MOTD noise (ads, ESM, landscape) — keep reboot-required
+        for f in /etc/update-motd.d/*; do
+            local base
+            base="$(basename "$f")"
+            case "$base" in
+                98-reboot-required|99-lab-motd) continue ;;
+                *) sudo chmod -x "$f" && log_info "Disabled default MOTD script: $base" ;;
+            esac
+        done
         sudo install -m 755 "$MOTD_SCRIPT" /etc/update-motd.d/99-lab-motd
         log_info "MOTD deployed to /etc/update-motd.d/99-lab-motd"
         ;;
