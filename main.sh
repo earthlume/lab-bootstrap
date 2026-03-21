@@ -7,6 +7,12 @@ source "$SCRIPT_DIR/lib/log.sh"
 source "$SCRIPT_DIR/lib/detect.sh"
 source "$SCRIPT_DIR/lib/utils.sh"
 
+# Validate target user exists before doing anything
+if ! id "$TARGET_USER" &>/dev/null; then
+    log_error "Target user '$TARGET_USER' does not exist — create it first, then re-run"
+    exit 1
+fi
+
 # Error trap — report which module/line failed
 trap 'log_error "Bootstrap failed at line $LINENO in ${BASH_SOURCE[0]}"' ERR
 
