@@ -42,12 +42,14 @@ install_zoxide() {
         return 0
     fi
     log_info "Installing zoxide ($ARCH)..."
-    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh || {
+    # Create target dir with correct ownership BEFORE installer runs (it installs to ~/.local/bin)
+    ensure_dir "$TARGET_HOME/.local/bin"
+    chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.local" "$TARGET_HOME/.local/bin"
+    # Run installer as the target user so paths and ownership are correct
+    sudo -u "$TARGET_USER" bash -c 'curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh' || {
         log_warn "Failed to install zoxide — skipping"
         return 1
     }
-    # Ensure ~/.local/bin exists (installer puts binary there)
-    ensure_dir "$TARGET_HOME/.local/bin"
     log_success "zoxide installed"
 }
 
