@@ -61,7 +61,10 @@ install_delta() {
     fi
     log_info "Installing delta ($ARCH)..."
     local url
-    url="$(github_asset_url "dandavison/delta" "${RUST_TARGET}\\.tar\\.gz$")" || return 1
+    # Try gnu first, fall back to musl (delta 0.19.0+ only ships musl for x86_64)
+    url="$(github_asset_url "dandavison/delta" "${RUST_TARGET}\\.tar\\.gz$" 2>/dev/null)" \
+        || url="$(github_asset_url "dandavison/delta" "${RUST_TARGET_MUSL}\\.tar\\.gz$")" \
+        || return 1
     curl -fsSL "$url" -o "$TMPDIR/delta.tar.gz" || { log_warn "Failed to download delta — skipping"; return 1; }
     tar -xzf "$TMPDIR/delta.tar.gz" -C "$TMPDIR"
     # Delta tarball extracts to a directory like delta-X.Y.Z-target/

@@ -12,13 +12,18 @@ log_success "Apt cleanup done"
 log_step "Summary"
 
 log_success "Base packages installed (bat, ripgrep, fd, fzf, btop, duf, tealdeer, ...)"
-command_exists eza && log_success "eza installed" || log_warn "eza not installed"
-command_exists zoxide && log_success "zoxide installed" || log_warn "zoxide not installed"
-command_exists delta && log_success "delta installed" || log_warn "delta not installed"
+# Helper: check if a command exists in root's PATH or the target user's ~/.local/bin
+check_installed() {
+    command -v "$1" &>/dev/null || [[ -x "$TARGET_HOME/.local/bin/$1" ]]
+}
+
+check_installed eza && log_success "eza installed" || log_warn "eza not installed"
+check_installed zoxide && log_success "zoxide installed" || log_warn "zoxide not installed"
+check_installed delta && log_success "delta installed" || log_warn "delta not installed"
 if ! is_arch armhf; then
-    command_exists dust && log_success "dust installed" || log_warn "dust not installed"
+    check_installed dust && log_success "dust installed" || log_warn "dust not installed"
 fi
-command_exists starship && log_success "Starship prompt installed" || log_warn "Starship not installed"
+check_installed starship && log_success "Starship prompt installed" || log_warn "Starship not installed"
 log_success "ZSH configured with Antidote plugins"
 log_success "Shell aliases and config deployed"
 log_success "Git identity configured (earthlume)"

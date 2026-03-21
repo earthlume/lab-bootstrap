@@ -11,7 +11,7 @@ zsh-users/zsh-autosuggestions
 zsh-users/zsh-history-substring-search
 
 # Alias reminder
-MichaelAqwortas/zsh-you-should-use
+MichaelAquilina/zsh-you-should-use
 
 # Sudo snippet (double-ESC)
 ohmyzsh/ohmyzsh path:plugins/sudo
