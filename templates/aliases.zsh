@@ -10,7 +10,7 @@ if command -v eza &>/dev/null; then
     alias lt='eza -la --icons --tree --level=2'
 fi
 
-alias cat='bat'
+alias cat='bat --paging=never'
 alias catp='bat -pp'      # plain mode, no paging — use when piping or for cat-like behavior
 alias grep='rg'
 alias find='fd'
@@ -20,7 +20,6 @@ if command -v dust &>/dev/null; then
 fi
 
 alias top='btop'
-alias df='duf'
 
 # ----- Navigation -----
 alias ..='cd ..'
