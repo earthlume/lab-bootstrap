@@ -3,6 +3,13 @@
 
 log_step "Cleanup"
 
+# Disable unnecessary services on non-Pi headless servers
+if [[ "$IS_PI" != true ]] && systemctl is-active --quiet ModemManager 2>/dev/null; then
+    log_info "Disabling ModemManager (no modem on headless server)..."
+    sudo systemctl disable --now ModemManager
+    log_success "ModemManager disabled"
+fi
+
 log_info "Running apt autoremove..."
 sudo apt-get autoremove -y -qq
 sudo apt-get clean -qq
