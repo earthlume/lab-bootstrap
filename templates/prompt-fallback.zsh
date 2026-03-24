@@ -1,4 +1,4 @@
-# Pure Zsh fallback prompt — used on ARMv6 devices where Starship is unavailable
+# Pure Zsh fallback prompt — used on ARMv6 devices where Powerlevel10k is unavailable
 # Teal accent to match lab.hoens.fun visual identity
 
 autoload -Uz vcs_info

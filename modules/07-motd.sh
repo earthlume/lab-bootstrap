@@ -9,7 +9,6 @@ case "$OS_ID" in
     ubuntu)
         # Ubuntu: disable default MOTD noise (ads, ESM, landscape) — keep reboot-required
         for f in /etc/update-motd.d/*; do
-            local base
             base="$(basename "$f")"
             case "$base" in
                 98-reboot-required|99-lab-motd) continue ;;

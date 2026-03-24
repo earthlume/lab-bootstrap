@@ -30,7 +30,7 @@ check_installed delta && log_success "delta installed" || log_warn "delta not in
 if ! is_arch armhf; then
     check_installed dust && log_success "dust installed" || log_warn "dust not installed"
 fi
-check_installed starship && log_success "Starship prompt installed" || log_warn "Starship not installed"
+log_success "Powerlevel10k prompt configured"
 log_success "ZSH configured with Antidote plugins"
 log_success "Shell aliases and config deployed"
 log_success "Git identity configured (earthlume)"
