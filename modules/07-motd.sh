@@ -12,7 +12,16 @@ fi
 
 case "$OS_ID" in
     ubuntu)
-        # Ubuntu: append our MOTD to the pipeline, keep existing scripts
+        # Ubuntu: silence default MOTD noise (Canonical ads, ESM, landscape)
+        # Uses regular variable (not local) — sourced at top level, not in a function
+        motd_entry=""
+        for motd_entry in /etc/update-motd.d/*; do
+            case "$(basename "$motd_entry")" in
+                98-reboot-required|99-lab-motd) continue ;;
+                *) sudo chmod -x "$motd_entry" 2>/dev/null || true ;;
+            esac
+        done
+        log_info "Disabled default Ubuntu MOTD scripts (kept 98-reboot-required, 99-lab-motd)"
         sudo install -m 755 "$MOTD_SCRIPT" /etc/update-motd.d/99-lab-motd
         log_info "MOTD deployed to /etc/update-motd.d/99-lab-motd"
         ;;
