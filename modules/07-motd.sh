@@ -3,19 +3,16 @@
 
 log_step "Deploying MOTD"
 
-MOTD_SCRIPT="$SCRIPT_DIR/templates/motd"
+# Fun tier gets the enhanced MOTD with figlet/lolcat/fortune/cowsay
+if [[ "${TIER:-work}" == "fun" ]]; then
+    MOTD_SCRIPT="$SCRIPT_DIR/templates/motd-fun"
+else
+    MOTD_SCRIPT="$SCRIPT_DIR/templates/motd"
+fi
 
 case "$OS_ID" in
     ubuntu)
-        # Ubuntu: disable default MOTD noise (ads, ESM, landscape) — keep reboot-required
-        for f in /etc/update-motd.d/*; do
-            local base
-            base="$(basename "$f")"
-            case "$base" in
-                98-reboot-required|99-lab-motd) continue ;;
-                *) sudo chmod -x "$f" && log_info "Disabled default MOTD script: $base" ;;
-            esac
-        done
+        # Ubuntu: append our MOTD to the pipeline, keep existing scripts
         sudo install -m 755 "$MOTD_SCRIPT" /etc/update-motd.d/99-lab-motd
         log_info "MOTD deployed to /etc/update-motd.d/99-lab-motd"
         ;;
