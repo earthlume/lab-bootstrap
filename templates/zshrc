@@ -1,6 +1,12 @@
 # ~/.zshrc — lab.hoens.fun fleet standard
 # Managed by lab-bootstrap. Re-run bootstrap to restore.
 
+# ----- Powerlevel10k instant prompt (MUST be first) -----
+# Caches the prompt so it appears instantly while zsh finishes loading.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # ----- Performance: cached compinit -----
 autoload -Uz compinit
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
@@ -12,13 +18,6 @@ fi
 # ----- Antidote plugin manager -----
 source "${ZDOTDIR:-$HOME}/.antidote/antidote.zsh"
 antidote load
-
-# ----- Prompt (Starship or fallback) -----
-if command -v starship &>/dev/null; then
-    eval "$(starship init zsh)"
-else
-    source ~/.config/zsh/prompt-fallback.zsh
-fi
 
 # ----- Zoxide (smart cd) -----
 if command -v zoxide &>/dev/null; then
@@ -69,3 +68,6 @@ DISABLE_MAGIC_FUNCTIONS=true
 
 # ----- Local overrides (not managed by bootstrap) -----
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# ----- Powerlevel10k config (must be at end) -----
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
