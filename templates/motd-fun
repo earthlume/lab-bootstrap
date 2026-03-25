@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# lab.hoens.fun — fun-tier MOTD
+# Wraps the base MOTD with figlet/lolcat banner and fortune/cowsay.
+# Every tool is guarded — degrades gracefully if anything is missing.
+# Target: under 2 seconds total render on a Pi 5.
+# shellcheck disable=SC2059 — ANSI codes in format strings are intentional
+
+T='\033[38;5;30m'
+R='\033[0m'
+
+# --- Figlet hostname banner (piped through lolcat if available) ---
+if command -v figlet &>/dev/null; then
+    BANNER="$(figlet -f small "$(hostname -s)" 2>/dev/null)"
+    if [[ -n "$BANNER" ]] && command -v lolcat &>/dev/null; then
+        echo "$BANNER" | lolcat -f 2>/dev/null
+    elif [[ -n "$BANNER" ]]; then
+        printf "${T}%s${R}\n" "$BANNER"
+    fi
+fi
+
+# --- System info via fastfetch or pfetch ---
+if command -v fastfetch &>/dev/null; then
+    fastfetch --logo none 2>/dev/null
+elif command -v pfetch &>/dev/null; then
+    PF_INFO="ascii title os kernel uptime memory" pfetch 2>/dev/null
+else
+    # Fall back to the base MOTD box
+    MOTD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    BASE_MOTD=""
+    # Try to find the base motd in common locations
+    for path in "$MOTD_SCRIPT_DIR/motd" /etc/update-motd.d/99-lab-motd /etc/profile.d/99-lab-motd.sh; do
+        if [[ -x "$path" ]] && [[ "$(basename "$path")" != "$(basename "${BASH_SOURCE[0]}")" ]]; then
+            BASE_MOTD="$path"
+            break
+        fi
+    done
+    if [[ -n "$BASE_MOTD" ]]; then
+        "$BASE_MOTD"
+    fi
+fi
+
+# --- Fortune + cowsay (if both available) ---
+if command -v fortune &>/dev/null && command -v cowsay &>/dev/null; then
+    printf "\n"
+    QUOTE="$(fortune -s 2>/dev/null)"
+    if [[ -n "$QUOTE" ]]; then
+        if command -v lolcat &>/dev/null; then
+            echo "$QUOTE" | cowsay -f small 2>/dev/null | lolcat -f 2>/dev/null
+        else
+            echo "$QUOTE" | cowsay -f small 2>/dev/null
+        fi
+    fi
+fi
+
+printf "\n"
