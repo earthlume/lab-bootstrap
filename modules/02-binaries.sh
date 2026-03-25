@@ -38,7 +38,7 @@ install_eza() {
 
 # --- zoxide ---
 install_zoxide() {
-    if command_exists zoxide; then
+    if [[ -x "$TARGET_HOME/.local/bin/zoxide" ]]; then
         log_info "zoxide already installed — skipping"
         return 0
     fi
