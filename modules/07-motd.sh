@@ -3,7 +3,12 @@
 
 log_step "Deploying MOTD"
 
-MOTD_SCRIPT="$SCRIPT_DIR/templates/motd"
+# Fun tier gets the enhanced MOTD with figlet/lolcat/fortune/cowsay
+if [[ "${TIER:-work}" == "fun" ]]; then
+    MOTD_SCRIPT="$SCRIPT_DIR/templates/motd-fun"
+else
+    MOTD_SCRIPT="$SCRIPT_DIR/templates/motd"
+fi
 
 case "$OS_ID" in
     ubuntu)
