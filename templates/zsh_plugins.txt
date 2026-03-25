@@ -16,5 +16,8 @@ MichaelAquilina/zsh-you-should-use
 # Sudo snippet (double-ESC)
 ohmyzsh/ohmyzsh path:plugins/sudo
 
+# Prompt theme
+romkatv/powerlevel10k
+
 # Syntax highlighting (MUST be last)
 zdharma-continuum/fast-syntax-highlighting

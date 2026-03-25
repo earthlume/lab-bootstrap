@@ -22,21 +22,22 @@ That's it. Safe to re-run at any time.
 
 The bootstrap asks one question before it runs: **work or fun?**
 
-- **Work** (default): Modules 01–08. Pure shell environment + tools. Nothing frivolous.
-- **Fun**: Modules 01–09. Everything in work, plus the dopamine toolkit — terminal toys, ASCII art, rainbow text, and a more expressive login MOTD.
+- **Work**: Modules 01–08. Pure shell environment + tools. Nothing frivolous.
+- **Fun** (default): Modules 01–09. Everything in work, plus the dopamine toolkit — terminal toys, ASCII art, rainbow text, and a more expressive login MOTD.
 
-Non-interactive runs (like `curl | bash`) default to **work** so nothing hangs. For scripted deployments:
+Default is **fun** — this is a homelab, not a datacenter. Non-interactive runs (`curl | bash`) also default to fun. For scripted deployments:
 
 ```bash
 ./bootstrap.sh --work   # explicit work tier
 ./bootstrap.sh --fun    # dopamine toolkit included
+LAB_MODE=work bash bootstrap.sh  # env var also works
 ```
 
 The choice is never stored — ask every time. Slash-and-burn means no state.
 
 ## What It Does
 
-Sets up a modern CLI environment — ZSH with plugins, Starship prompt, and a curated set of tools that replace the crusty defaults. This is **general-purpose shell setup only** — no Docker, no application services, no role-specific software.
+Sets up a modern CLI environment — ZSH with plugins, Powerlevel10k prompt, and a curated set of tools that replace the crusty defaults. This is **general-purpose shell setup only** — no Docker, no application services, no role-specific software.
 
 ### Packages (via apt)
 
@@ -55,7 +56,7 @@ Sets up a modern CLI environment — ZSH with plugins, Starship prompt, and a cu
 
 - **ZSH** as default shell with [Antidote](https://github.com/mattmc3/antidote) plugin manager
 - **Plugins:** autosuggestions, syntax highlighting, history substring search, sudo (double-ESC), alias reminders
-- **[Starship](https://starship.rs)** prompt with teal accent — shows hostname (SSH only), directory, git, command duration
+- **[Powerlevel10k](https://github.com/romkatv/powerlevel10k)** prompt with teal accent, instant prompt, transient prompt — shows hostname (SSH only), directory, git, command duration. Works on all architectures including ARMv6.
 - **Aliases** that map old commands to modern replacements (`ls`→`eza`, `cat`→`bat`, `grep`→`rg`, `find`→`fd`)
 - **fzf** keybindings (Ctrl-R for history, Ctrl-T for files)
 
@@ -64,6 +65,7 @@ Sets up a modern CLI environment — ZSH with plugins, Starship prompt, and a cu
 - **SSH:** ed25519 keypair generated (displayed at end for GitHub setup)
 - **Git:** identity configured (`earthlume`), delta as pager with side-by-side diffs
 - **MOTD:** branded login banner with live system info (hostname, OS, uptime, IP, CPU, memory, disk)
+- **Timezone:** set to America/Los_Angeles (fleet-wide)
 
 ## The Dopamine Toolkit (Fun Tier)
 
@@ -125,9 +127,9 @@ Every default in this setup externalizes something — a decision, a command you
 | Reduced activation energy | One-command install, `AUTO_CD`, zoxide frecency, `catp` plain mode |
 | Recognition over recall | Autosuggestions, history substring search (arrow keys) |
 | Fuzzy over exact | fzf Ctrl-R / Ctrl-T — partial recall beats perfect recall |
-| Visual anchoring | eza `--icons`, bat syntax highlighting, Starship color-coded prompt |
-| Fast feedback | Instant prompt (cached compinit <50ms), async autosuggestions |
-| Graceful degradation | ARMv6 fallback prompt, guarded aliases, idempotent re-runs |
+| Visual anchoring | eza `--icons`, bat syntax highlighting, p10k color-coded prompt |
+| Fast feedback | Instant prompt (<50ms), transient prompt, async autosuggestions |
+| Graceful degradation | p10k works on ARMv6, guarded aliases, idempotent re-runs |
 | Dopamine on demand | Fun tier tools spark joy when you need a break — and stay silent when you don't |
 
 None of this requires opt-in. It's the default — because good defaults are the whole point.
@@ -143,7 +145,7 @@ The bootstrapper auto-detects CPU architecture (including ARM sub-version via `/
 | Apt tools (bat, rg, fd, fzf, btop, duf) | ✅ | ✅ | ✅ | ✅ |
 | GitHub binaries (eza, zoxide, delta) | ✅ | ✅ | ✅ | ❌ |
 | dust | ✅ | ✅ | ❌ | ❌ |
-| Starship prompt | ✅ | ✅ | ✅ | ❌ (fallback) |
+| Powerlevel10k prompt | ✅ | ✅ | ✅ | ✅ |
 | ZSH + Antidote plugins | ✅ | ✅ | ✅ | ✅ |
 | Dopamine toolkit (fun tier) | ✅ (full) | ✅ (full) | ✅ (apt + conditional) | ✅ (apt only) |
 
@@ -152,11 +154,10 @@ The bootstrapper auto-detects CPU architecture (including ARM sub-version via `/
 On ARMv6 devices, the bootstrapper automatically:
 
 - **Skips all GitHub-hosted binaries** — the `armhf` builds published on GitHub target ARMv7 minimum and will not execute on ARMv6
-- **Skips Starship** — no ARMv6 build exists. A **pure Zsh fallback prompt** is deployed instead, with teal accents, `vcs_info` git branch display, and SSH-only hostname — same look, zero dependencies
 - **Guards aliases** — `ls`→`eza` and `du`→`dust` aliases are wrapped in `command -v` checks so they silently degrade to system defaults when the tools aren't present
 - **Scales the dopamine toolkit** — apt tools install fine, compiled tools and TTE are skipped, pfetch replaces fastfetch
 
-All apt-installed tools (bat, ripgrep, fd, fzf, btop, duf, tealdeer) work on ARMv6.
+Powerlevel10k works on ARMv6 with no degradation — it's pure Zsh, no binary required. All apt-installed tools (bat, ripgrep, fd, fzf, btop, duf, tealdeer) work on ARMv6.
 
 ### Low RAM Detection (≤512 MB)
 
@@ -178,7 +179,7 @@ The bootstrapper detects total system RAM from `/proc/meminfo` and sets an `IS_L
 | 01 | packages | `apt update` + install base packages and modern CLI tools |
 | 02 | binaries | Download eza, zoxide, delta, dust from GitHub releases (skipped on ARMv6) |
 | 03 | zsh | Install Antidote, deploy plugins, `chsh` to zsh |
-| 04 | starship | Install Starship + config, or deploy fallback prompt on ARMv6 |
+| 04 | prompt | Deploy Powerlevel10k config (loaded via Antidote, works on all architectures) |
 | 05 | shell-config | Deploy `.zshrc`, aliases, create `bat`/`fd` symlinks |
 | 06 | ssh | Generate ed25519 keypair, configure git identity + delta |
 | 07 | motd | Deploy branded MOTD with live system stats (OS-aware, fun-tier enhanced) |
@@ -192,9 +193,10 @@ lab-bootstrap/
 ├── bootstrap.sh          # curl target — installs git, clones repo, runs main.sh
 ├── main.sh               # sources lib/, runs modules in order, handles tier selection
 ├── modules/              # numbered modules, executed sequentially
+│   ├── 04-prompt.sh     # deploys Powerlevel10k config
 │   └── 09-dopamine.sh   # fun-tier terminal toys and visual tools
 ├── templates/            # config files deployed to the system
-│   ├── prompt-fallback.zsh   # pure Zsh prompt for ARMv6 (no Starship)
+│   ├── p10k.zsh              # Powerlevel10k config (lean style, teal accent)
 │   ├── motd-fun              # enhanced MOTD for fun tier
 │   └── ...
 ├── lib/                  # shared functions (logging, detection, helpers)
