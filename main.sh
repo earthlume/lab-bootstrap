@@ -17,7 +17,10 @@ if ! id "$TARGET_USER" &>/dev/null; then
 fi
 
 # --- Tier selection: work (modules 01-08) or fun (01-09) ---
-TIER="work"
+# Default to fun — this is a homelab, not a datacenter.
+TIER="${LAB_MODE:-fun}"
+
+# CLI flags override env var
 for arg in "$@"; do
     case "$arg" in
         --work) TIER="work" ;;
@@ -25,18 +28,21 @@ for arg in "$@"; do
     esac
 done
 
-# If no flag was given and we're interactive, ask
-if [[ "$TIER" == "work" ]] && ! [[ " $* " == *" --work "* ]]; then
-    if [[ -t 0 ]]; then
-        printf "\n  ┌─────────────────────────────────────┐\n"
-        printf "  │  Work or fun? [w/f]:                │\n"
-        printf "  └─────────────────────────────────────┘\n"
-        printf "  > "
-        read -r tier_choice
-        case "$tier_choice" in
-            f|F|fun) TIER="fun" ;;
-        esac
-    fi
+# If no explicit choice (env var or flag), ask interactively
+EXPLICIT=false
+[[ -n "${LAB_MODE:-}" ]] && EXPLICIT=true
+[[ " $* " == *" --work "* ]] || [[ " $* " == *" --fun "* ]] && EXPLICIT=true
+
+if [[ "$EXPLICIT" == false ]] && [[ -t 0 ]]; then
+    printf "\n  ┌─────────────────────────────────────┐\n"
+    printf "  │  Work or fun? [w/F]:                │\n"
+    printf "  └─────────────────────────────────────┘\n"
+    printf "  > "
+    read -r tier_choice
+    case "$tier_choice" in
+        w|W|work) TIER="work" ;;
+        *)        TIER="fun"  ;;
+    esac
 fi
 export TIER
 
@@ -48,8 +54,12 @@ log_info "Host: $HOSTNAME_SHORT | Arch: $ARCH | OS: $OS_ID $OS_VERSION"
 log_info "Tier: $TIER"
 [[ "$IS_PI" == true ]] && log_info "Pi Model: $PI_MODEL"
 [[ -n "$ARM_VERSION" ]] && log_info "ARM version: $ARM_VERSION"
-[[ "$IS_ARMV6" == true ]] && log_warn "ARMv6 detected — GitHub-hosted binaries and Starship will be skipped"
+[[ "$IS_ARMV6" == true ]] && log_warn "ARMv6 detected — GitHub-hosted binaries will be skipped"
 [[ "$IS_LOW_RAM" == true ]] && log_warn "Low RAM detected (${TOTAL_RAM_MB} MB) — device has ≤512 MB"
+
+# Set timezone (entire fleet is in LA)
+log_info "Setting timezone to America/Los_Angeles"
+sudo timedatectl set-timezone America/Los_Angeles 2>/dev/null || log_warn "timedatectl not available — timezone not set"
 
 for module in "$SCRIPT_DIR"/modules/[0-9]*.sh; do
     # Skip the dopamine module in work tier

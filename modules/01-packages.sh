@@ -20,5 +20,5 @@ log_success "Base packages installed"
 # Seed tealdeer cache (non-fatal)
 if command_exists tldr; then
     log_info "Updating tldr cache..."
-    tldr --update 2>/dev/null || log_warn "tldr cache update failed (network?)"
+    timeout 15 tldr --update 2>/dev/null || log_warn "tldr cache update failed or timed out (network?)"
 fi
