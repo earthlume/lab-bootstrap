@@ -24,6 +24,21 @@ else
     git clone --depth=1 "$REPO_URL" "$INSTALL_DIR"
 fi
 
+# Ask work/fun BEFORE sudo so the user doesn't burn sudo attempts
+# before even starting. main.sh will see the explicit flag and skip its prompt.
+TIER_FLAG=""
+if [[ -z "${LAB_MODE:-}" ]] && [[ " $* " != *" --work "* ]] && [[ " $* " != *" --fun "* ]] && [[ -t 0 ]]; then
+    printf "\n  ┌─────────────────────────────────────┐\n"
+    printf "  │  Work or fun? [w/F]:                │\n"
+    printf "  └─────────────────────────────────────┘\n"
+    printf "  > "
+    read -r tier_choice
+    case "$tier_choice" in
+        w|W|work) TIER_FLAG="--work" ;;
+        *)        TIER_FLAG="--fun"  ;;
+    esac
+fi
+
 # Hand off to main.sh (exec avoids stdin issues from curl pipe)
 # Pass CLI flags (--work / --fun) through to main.sh
-exec sudo bash "$INSTALL_DIR/main.sh" "$@"
+exec sudo bash "$INSTALL_DIR/main.sh" "$@" $TIER_FLAG
