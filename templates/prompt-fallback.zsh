@@ -10,4 +10,5 @@ setopt PROMPT_SUBST
 # Show hostname only over SSH
 [[ -n "$SSH_CONNECTION" ]] && _host="%F{030}%m%f:" || _host=""
 
-PROMPT='${_host}%F{030}%~%f${vcs_info_msg_0_} %F{030}❯%f '
+# %(?.true.false) — teal ❯ on success, red ❯ on non-zero exit
+PROMPT='${_host}%F{030}%~%f${vcs_info_msg_0_} %(?.%F{030}.%F{160})❯%f '
