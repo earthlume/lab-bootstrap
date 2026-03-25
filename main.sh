@@ -48,7 +48,7 @@ log_info "Host: $HOSTNAME_SHORT | Arch: $ARCH | OS: $OS_ID $OS_VERSION"
 log_info "Tier: $TIER"
 [[ "$IS_PI" == true ]] && log_info "Pi Model: $PI_MODEL"
 [[ -n "$ARM_VERSION" ]] && log_info "ARM version: $ARM_VERSION"
-[[ "$IS_ARMV6" == true ]] && log_warn "ARMv6 detected — GitHub-hosted binaries and Starship will be skipped"
+[[ "$IS_ARMV6" == true ]] && log_warn "ARMv6 detected — GitHub-hosted binaries will be skipped"
 [[ "$IS_LOW_RAM" == true ]] && log_warn "Low RAM detected (${TOTAL_RAM_MB} MB) — device has ≤512 MB"
 
 for module in "$SCRIPT_DIR"/modules/[0-9]*.sh; do
