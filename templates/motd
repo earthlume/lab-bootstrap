@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # lab.hoens.fun — dynamic MOTD
 # Generates live system info with teal-accented Unicode box drawing
+# shellcheck disable=SC2059 — ANSI codes in format strings are intentional
 
 # Colors
 T='\033[38;5;30m'   # teal
@@ -11,7 +12,7 @@ R='\033[0m'         # reset
 # Gather system info
 HOSTNAME_FULL="$(hostname -s).lab.hoens.fun"
 OS_PRETTY="$(. /etc/os-release && echo "$PRETTY_NAME")"
-ARCH="$(uname -m)"
+MOTD_ARCH="$(uname -m)"
 UPTIME="$(uptime -p 2>/dev/null | sed 's/^up //' || uptime | sed 's/.*up//' | sed 's/,.*load.*//' | xargs)"
 
 # IP — prefer 10.4.20.x, fall back to first non-loopback
@@ -23,15 +24,9 @@ else
 fi
 
 # CPU info
-if [[ -f /proc/device-tree/model ]] && grep -q "Raspberry Pi" /proc/device-tree/model 2>/dev/null; then
-    CPU_COUNT="$(nproc)"
-    CPU_MODEL="$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | xargs || echo "ARM")"
-    CPU="${CPU_COUNT}× ${CPU_MODEL}"
-else
-    CPU_COUNT="$(nproc)"
-    CPU_MODEL="$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | xargs || echo "unknown")"
-    CPU="${CPU_COUNT}× ${CPU_MODEL}"
-fi
+CPU_COUNT="$(nproc)"
+CPU_MODEL="$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | xargs || echo "unknown")"
+CPU="${CPU_COUNT}× ${CPU_MODEL}"
 
 # Memory
 MEM_TOTAL="$(free -h | awk '/^Mem:/{print $2}')"
@@ -43,15 +38,12 @@ DISK_TOTAL="$(df -h / | awk 'NR==2{print $2}')"
 DISK_USED="$(df -h / | awk 'NR==2{print $3}')"
 DISK_PCT="$(df / | awk 'NR==2{gsub(/%/,""); print $5}')"
 
-# Box width
-BW=47
-
 # Print
 printf "\n"
 printf "  ${T}┌─────────────────────────────────────────────┐${R}\n"
 printf "  ${T}│${R}  ⚡ ${T}${W}%-43s${R}${T}│${R}\n" "$HOSTNAME_FULL"
 printf "  ${T}│${R}  %-45s${T}│${R}\n" ""
-printf "  ${T}│${R}  ${D}OS      ${W}%-36s${R}${T}│${R}\n" "$OS_PRETTY $ARCH"
+printf "  ${T}│${R}  ${D}OS      ${W}%-36s${R}${T}│${R}\n" "$OS_PRETTY $MOTD_ARCH"
 printf "  ${T}│${R}  ${D}Uptime  ${W}%-36s${R}${T}│${R}\n" "$UPTIME"
 printf "  ${T}│${R}  ${D}IP      ${W}%-36s${R}${T}│${R}\n" "$IP"
 printf "  ${T}│${R}  ${D}CPU     ${W}%-36s${R}${T}│${R}\n" "$CPU"
