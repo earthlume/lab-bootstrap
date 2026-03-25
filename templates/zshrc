@@ -66,6 +66,13 @@ DISABLE_MAGIC_FUNCTIONS=true
 # ----- Aliases -----
 [[ -f "$HOME/.config/zsh/aliases.zsh" ]] && source "$HOME/.config/zsh/aliases.zsh"
 
+# ----- Theme: Catppuccin Mocha -----
+export BAT_THEME="Catppuccin Mocha"
+export FZF_DEFAULT_OPTS=" \
+    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+
 # ----- Local overrides (not managed by bootstrap) -----
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 

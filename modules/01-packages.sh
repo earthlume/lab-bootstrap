@@ -17,8 +17,10 @@ sudo apt-get install -y -qq \
 
 log_success "Base packages installed"
 
-# Seed tealdeer cache (non-fatal)
+# Seed tealdeer cache in background (non-blocking, non-fatal)
+# DNS may not be ready during early bootstrap — backgrounding avoids blocking.
+# Self-populates on first real usage anyway.
 if command_exists tldr; then
-    log_info "Updating tldr cache..."
-    timeout 15 tldr --update 2>/dev/null || log_warn "tldr cache update failed or timed out (network?)"
+    log_info "Seeding tldr cache in background..."
+    ( timeout 30 tldr --update &>/dev/null & )
 fi
