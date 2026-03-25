@@ -227,11 +227,32 @@ if command_exists python3; then
         if [[ "$IS_ARMV6" != true ]]; then
             log_info "Installing terminaltexteffects..."
             if command_exists pipx; then
-                pipx install terminaltexteffects 2>/dev/null && log_success "TTE installed (pipx)" || log_warn "TTE install failed — skipping"
+                if pipx install terminaltexteffects 2>/dev/null; then
+                    log_success "TTE installed (pipx)"
+                else
+                    log_warn "TTE install via pipx failed — skipping"
+                fi
             else
-                sudo python3 -m pip install --break-system-packages terminaltexteffects 2>/dev/null \
-                    && log_success "TTE installed (pip)" \
-                    || log_warn "TTE install failed — skipping"
+                # Find a working pip command
+                PIP_CMD="$(command -v pip3 2>/dev/null || command -v pip 2>/dev/null || true)"
+                if [[ -z "$PIP_CMD" ]]; then
+                    log_info "pip not found — installing python3-pip..."
+                    sudo apt-get install -y -qq python3-pip 2>/dev/null || true
+                    PIP_CMD="$(command -v pip3 2>/dev/null || command -v pip 2>/dev/null || true)"
+                fi
+                if [[ -n "$PIP_CMD" ]]; then
+                    # Try --break-system-packages first (required on Debian 12+ / Ubuntu 23.04+)
+                    # Fall back without it for older pip versions
+                    if sudo "$PIP_CMD" install --break-system-packages terminaltexteffects 2>/dev/null; then
+                        log_success "TTE installed (pip)"
+                    elif sudo "$PIP_CMD" install terminaltexteffects 2>/dev/null; then
+                        log_success "TTE installed (pip, legacy mode)"
+                    else
+                        log_warn "TTE install via pip failed — skipping"
+                    fi
+                else
+                    log_warn "No pip available — TTE skipped"
+                fi
             fi
         fi
     else
