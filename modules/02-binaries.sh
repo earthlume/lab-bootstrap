@@ -11,7 +11,8 @@ if [[ "$IS_ARMV6" == true ]]; then
 fi
 
 TMPDIR="$(mktemp -d)"
-trap "rm -rf '$TMPDIR'" RETURN
+# shellcheck disable=SC2064 — TMPDIR must expand now (at definition), not at trap time
+trap "rm -rf \"$TMPDIR\"" RETURN
 
 # Map ARCH to Rust target triples used in GitHub release asset names
 case "$ARCH" in
