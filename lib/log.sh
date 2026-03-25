@@ -11,6 +11,7 @@ readonly _BOLD='\033[1m'
 readonly _DIM='\033[2m'
 readonly _RESET='\033[0m'
 
+# shellcheck disable=SC2059 — ANSI codes in format strings are intentional
 log_info() {
     printf "${_TEAL}[•]${_RESET} %s\n" "$*"
 }

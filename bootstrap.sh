@@ -25,4 +25,5 @@ else
 fi
 
 # Hand off to main.sh (exec avoids stdin issues from curl pipe)
-exec sudo bash "$INSTALL_DIR/main.sh"
+# Pass CLI flags (--work / --fun) through to main.sh
+exec sudo bash "$INSTALL_DIR/main.sh" "$@"

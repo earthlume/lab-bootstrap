@@ -10,8 +10,8 @@ if command -v eza &>/dev/null; then
     alias lt='eza -la --icons --tree --level=2'
 fi
 
-alias cat='bat --paging=never'
-alias catp='bat -pp'      # plain mode, no paging — use when piping or for cat-like behavior
+alias cat='bat'
+alias catp='bat -pp'      # plain + no paging — pipe-friendly, true cat replacement
 alias grep='rg'
 alias find='fd'
 
