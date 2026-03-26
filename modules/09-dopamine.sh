@@ -279,4 +279,28 @@ else
     log_info "btop not installed — skipping theme"
 fi
 
+# ============================================================================
+# Theme: Catppuccin Mocha for bat + delta
+# ============================================================================
+
+if command_exists bat; then
+    BAT_THEME_DIR="$TARGET_HOME/.config/bat/themes"
+    ensure_dir "$BAT_THEME_DIR"
+    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/bat"
+    if curl -sL -o "$BAT_THEME_DIR/Catppuccin Mocha.tmTheme" \
+        "https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme" 2>/dev/null; then
+        chown "$TARGET_USER:$TARGET_USER" "$BAT_THEME_DIR/Catppuccin Mocha.tmTheme"
+        sudo -u "$TARGET_USER" bat cache --build 2>/dev/null || true
+        log_success "bat Catppuccin Mocha theme installed"
+    else
+        log_warn "Failed to download bat theme — skipping"
+    fi
+fi
+
+# delta uses bat's theme engine — just set the syntax-theme in git config
+if command_exists delta; then
+    sudo -u "$TARGET_USER" git config --global delta.syntax-theme "Catppuccin Mocha"
+    log_info "delta syntax theme set to Catppuccin Mocha"
+fi
+
 log_success "Dopamine toolkit complete"
