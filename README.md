@@ -7,7 +7,8 @@ Universal CLI bootstrapper for [lab.hoens.fun](https://lab.hoens.fun) — one co
 On a freshly flashed Debian-based host where user `lume` exists:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/earthlume/lab-bootstrap/main/bootstrap.sh | bash
+git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-bootstrap
+bash ~/.local/share/lab-bootstrap/bootstrap.sh
 ```
 
 Then start a new shell:
