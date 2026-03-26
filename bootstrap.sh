@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # bootstrap.sh — curl-pipe-sh entry point for lab-bootstrap
-# Usage: curl -sL https://raw.githubusercontent.com/earthlume/lab-bootstrap/main/bootstrap.sh | bash
+# Usage: git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-bootstrap && bash ~/.local/share/lab-bootstrap/bootstrap.sh
 set -euo pipefail
 
 REPO_URL="https://github.com/earthlume/lab-bootstrap.git"
