@@ -22,7 +22,7 @@ fi
 if command -v fastfetch &>/dev/null; then
     fastfetch --logo none --structure OS:Kernel:Uptime:Memory:Disk:LocalIP 2>/dev/null
 elif command -v pfetch &>/dev/null; then
-    PF_INFO="ascii title os kernel uptime memory" pfetch 2>/dev/null
+    PF_INFO="title os kernel uptime memory" pfetch 2>/dev/null
 else
     # Fall back to the base MOTD box
     MOTD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
