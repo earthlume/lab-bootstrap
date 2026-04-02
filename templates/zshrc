@@ -3,6 +3,9 @@
 
 # ----- Powerlevel10k instant prompt (MUST be first) -----
 # Caches the prompt so it appears instantly while zsh finishes loading.
+# Disable on login shells so MOTD from profile.d displays cleanly.
+# Non-login shells (subshells, new tabs) still get instant prompt.
+[[ -o login ]] && typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -78,6 +81,3 @@ export FZF_DEFAULT_OPTS=" \
 
 # ----- Powerlevel10k config (must be at end) -----
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# ----- MOTD (Debian/Pi OS: profile.d is suppressed by p10k instant prompt) -----
-[[ -o login && -r /etc/profile.d/99-lab-motd.sh ]] && source /etc/profile.d/99-lab-motd.sh
