@@ -9,7 +9,7 @@ HTTPS_URL="https://github.com/earthlume/lab-bootstrap.git"
 SSH_URL="git@github.com:earthlume/lab-bootstrap.git"
 INSTALL_DIR="${HOME}/.local/share/lab-bootstrap"
 
-echo "[•] lab-bootstrap — lab.hoens.fun fleet provisioner"
+echo "[•] lab-bootstrap — fleet provisioner"
 
 # Ensure git is available
 if ! command -v git &>/dev/null; then

@@ -1,10 +1,10 @@
 # lab-bootstrap
 
-Universal CLI bootstrapper for [lab.hoens.fun](https://lab.hoens.fun) — one command to set up a consistent, polished shell environment across every node in the fleet.
+Universal CLI bootstrapper for ADHD-INTP homelabbers — zsh, modern tools, dopamine-friendly defaults, fleet-wide consistency.
 
 ## Quick Start
 
-On a freshly flashed Debian-based host where user `lume` exists:
+On a freshly flashed Debian-based host where your provisioning user exists:
 
 ```bash
 git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-bootstrap
@@ -66,11 +66,11 @@ Sets up a modern CLI environment — ZSH with plugins, Powerlevel10k prompt, and
 - **SSH:** ed25519 keypair generated (displayed at end for GitHub setup)
 - **Git:** identity configured (`earthlume`), delta as pager with side-by-side diffs
 - **MOTD:** branded login banner with live system info (hostname, OS, uptime, IP, CPU, memory, disk)
-- **Timezone:** set to America/Los_Angeles (fleet-wide)
+- **Timezone:** configurable via `LAB_TIMEZONE` env var (default: UTC)
 
 ## The Dopamine Toolkit (Fun Tier)
 
-Module 09 installs terminal toys and visual tools. Every single one sits inert on disk until you type its name — zero daemons, zero auto-start, zero ambient resource usage.
+Module 10 installs terminal toys and visual tools. Every single one sits inert on disk until you type its name — zero daemons, zero auto-start, zero ambient resource usage.
 
 ### What Gets Installed
 
@@ -185,7 +185,8 @@ The bootstrapper detects total system RAM from `/proc/meminfo` and sets an `IS_L
 | 06 | ssh | Generate ed25519 keypair, configure git identity + delta |
 | 07 | motd | Deploy branded MOTD with live system stats (OS-aware, fun-tier enhanced) |
 | 08 | cleanup | `apt autoremove`, print summary, show SSH pubkey |
-| 09 | dopamine | Terminal toys, system splash, visual tools (**fun tier only**) |
+| 09 | docker-prep | Create `/opt/stacks`, Docker readiness check |
+| 10 | dopamine | Terminal toys, system splash, visual tools (**fun tier only**) |
 
 ## Repo Structure
 
@@ -195,7 +196,8 @@ lab-bootstrap/
 ├── main.sh               # sources lib/, runs modules in order, handles tier selection
 ├── modules/              # numbered modules, executed sequentially
 │   ├── 04-prompt.sh     # deploys Powerlevel10k config
-│   └── 09-dopamine.sh   # fun-tier terminal toys and visual tools
+│   ├── 09-docker-prep.sh # /opt/stacks setup when Docker is present
+│   └── 10-dopamine.sh   # fun-tier terminal toys and visual tools
 ├── templates/            # config files deployed to the system
 │   ├── p10k.zsh              # Powerlevel10k config (lean style, teal accent)
 │   ├── motd-fun              # enhanced MOTD for fun tier
@@ -203,6 +205,24 @@ lab-bootstrap/
 ├── lib/                  # shared functions (logging, detection, helpers)
 ├── LICENSE               # MIT
 └── README.md
+```
+
+## Configuration
+
+The bootstrapper uses environment variables for fleet-specific settings. All have sensible defaults.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `LAB_DOMAIN` | `lab.example` | Domain suffix for SSH key comments and MOTD hostname display |
+| `LAB_SUBNET` | *(empty)* | Preferred IP subnet for MOTD and `labip` alias (e.g. `10.4.20`). If unset, shows first non-loopback IP |
+| `LAB_TIMEZONE` | `UTC` | Timezone set during bootstrap (e.g. `America/Los_Angeles`) |
+| `LAB_MODE` | `fun` | Tier selection: `work` or `fun`. CLI flags `--work`/`--fun` override this |
+| `TARGET_USER` | `lume` | User account the bootstrap configures (set in `lib/utils.sh`) |
+
+Example: customize for your fleet:
+
+```bash
+LAB_DOMAIN=mylab.local LAB_SUBNET=192.168.1 LAB_TIMEZONE=Europe/London bash bootstrap.sh --work
 ```
 
 ## Per-Host Customization

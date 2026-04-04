@@ -23,17 +23,20 @@ case "$OS_ID" in
         done
         log_info "Disabled default Ubuntu MOTD scripts (kept 98-reboot-required, 99-lab-motd)"
         sudo install -m 755 "$MOTD_SCRIPT" /etc/update-motd.d/99-lab-motd
+        sudo sed -i -e "s|__LAB_DOMAIN__|${LAB_DOMAIN}|g" -e "s|__LAB_SUBNET__|${LAB_SUBNET}|g" /etc/update-motd.d/99-lab-motd
         log_info "MOTD deployed to /etc/update-motd.d/99-lab-motd"
         ;;
     debian|raspbian)
         # Debian / Raspberry Pi OS: replace /etc/motd, deploy via profile.d
         [[ -f /etc/motd ]] && sudo truncate -s 0 /etc/motd
         sudo install -m 755 "$MOTD_SCRIPT" /etc/profile.d/99-lab-motd.sh
+        sudo sed -i -e "s|__LAB_DOMAIN__|${LAB_DOMAIN}|g" -e "s|__LAB_SUBNET__|${LAB_SUBNET}|g" /etc/profile.d/99-lab-motd.sh
         log_info "MOTD deployed to /etc/profile.d/99-lab-motd.sh"
         ;;
     *)
         log_warn "Unknown OS_ID '$OS_ID' — deploying MOTD via profile.d as fallback"
         sudo install -m 755 "$MOTD_SCRIPT" /etc/profile.d/99-lab-motd.sh
+        sudo sed -i -e "s|__LAB_DOMAIN__|${LAB_DOMAIN}|g" -e "s|__LAB_SUBNET__|${LAB_SUBNET}|g" /etc/profile.d/99-lab-motd.sh
         ;;
 esac
 
