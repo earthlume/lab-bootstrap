@@ -63,7 +63,7 @@ sudo timedatectl set-timezone America/Los_Angeles 2>/dev/null || log_warn "timed
 
 for module in "$SCRIPT_DIR"/modules/[0-9]*.sh; do
     # Skip the dopamine module in work tier
-    if [[ "$TIER" == "work" ]] && [[ "$(basename "$module")" == "09-"* ]]; then
+    if [[ "$TIER" == "work" ]] && [[ "$(basename "$module")" == "10-"* ]]; then
         continue
     fi
     # shellcheck disable=SC1090
