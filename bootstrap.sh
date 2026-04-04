@@ -27,10 +27,14 @@ else
     echo "[•] No GitHub SSH access — using HTTPS clone URL"
 fi
 
-# Clone or pull the repo
+# Clone or update the repo
 if [[ -d "$INSTALL_DIR/.git" ]]; then
     echo "[•] Updating existing installation..."
-    git -C "$INSTALL_DIR" pull --quiet
+    git -C "$INSTALL_DIR" pull --ff-only --quiet 2>/dev/null || {
+        echo "[•] Local copy diverged — re-cloning fresh"
+        rm -rf "$INSTALL_DIR"
+        git clone --depth=1 "$REPO_URL" "$INSTALL_DIR"
+    }
 else
     echo "[•] Cloning lab-bootstrap..."
     git clone --depth=1 "$REPO_URL" "$INSTALL_DIR"
