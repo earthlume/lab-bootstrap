@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lab.hoens.fun — fun-tier MOTD
+# Fun-tier MOTD
 # Wraps the base MOTD with figlet/lolcat banner and fortune/cowsay.
 # Every tool is guarded — degrades gracefully if anything is missing.
 # Target: under 2 seconds total render on a Pi 5.

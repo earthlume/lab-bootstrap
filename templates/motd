@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lab.hoens.fun — dynamic MOTD
+# __LAB_DOMAIN__ — dynamic MOTD
 # Generates live system info with teal-accented Unicode box drawing
 # shellcheck disable=SC2059 — ANSI codes in format strings are intentional
 
@@ -10,16 +10,18 @@ D='\033[0;37m'      # dim white
 R='\033[0m'         # reset
 
 # Gather system info
-HOSTNAME_FULL="$(hostname -s).lab.hoens.fun"
+HOSTNAME_FULL="$(hostname -s).__LAB_DOMAIN__"
 OS_PRETTY="$(. /etc/os-release && echo "$PRETTY_NAME")"
 MOTD_ARCH="$(uname -m)"
 UPTIME="$(uptime -p 2>/dev/null | sed 's/^up //' || uptime | sed 's/.*up//' | sed 's/,.*load.*//' | xargs)"
 
-# IP — prefer 10.4.20.x, fall back to first non-loopback
-IP="$(ip -4 addr show 2>/dev/null | grep -oP 'inet 10\.4\.20\.\K\d+' | head -1)"
-if [[ -n "$IP" ]]; then
-    IP="10.4.20.$IP"
-else
+# IP — prefer lab subnet if configured, fall back to first non-loopback
+LAB_NET="__LAB_SUBNET__"
+if [[ -n "$LAB_NET" ]]; then
+    IP="$(ip -4 addr show 2>/dev/null | grep -oP "inet ${LAB_NET//./\\.}\\.\K\\d+" | head -1)"
+    [[ -n "$IP" ]] && IP="${LAB_NET}.$IP"
+fi
+if [[ -z "${IP:-}" ]]; then
     IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 fi
 

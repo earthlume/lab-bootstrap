@@ -33,11 +33,57 @@ fi
 log_success "Powerlevel10k prompt configured (via Antidote)"
 log_success "ZSH configured with Antidote plugins"
 log_success "Shell aliases and config deployed"
-log_success "Git identity configured (earthlume)"
 log_success "MOTD deployed"
 
-# Display SSH public key
+# --- System overview ---
+log_step "System overview"
+
+# Docker
+if command_exists docker; then
+    DOCKER_VER="$(docker --version 2>/dev/null | head -1)"
+    log_info "Docker: $DOCKER_VER"
+    if id -nG "$TARGET_USER" 2>/dev/null | grep -qw docker; then
+        log_success "$TARGET_USER is in the docker group"
+    else
+        log_warn "$TARGET_USER is NOT in the docker group — run: sudo usermod -aG docker $TARGET_USER"
+    fi
+else
+    log_info "Docker: not installed"
+fi
+
+# zsh
+if command_exists zsh; then
+    log_info "zsh: $(zsh --version 2>/dev/null | head -1)"
+else
+    log_warn "zsh: not installed"
+fi
+
+# git identity
+GIT_NAME="$(sudo -u "$TARGET_USER" git config --global user.name 2>/dev/null || true)"
+GIT_EMAIL="$(sudo -u "$TARGET_USER" git config --global user.email 2>/dev/null || true)"
+if [[ -n "$GIT_NAME" ]]; then
+    log_info "git: $GIT_NAME <$GIT_EMAIL>"
+else
+    log_warn "git: no identity configured"
+fi
+
+# SSH key fingerprint
 SSH_PUB="$TARGET_HOME/.ssh/id_ed25519.pub"
+if [[ -f "$SSH_PUB" ]]; then
+    SSH_FP="$(ssh-keygen -lf "$SSH_PUB" 2>/dev/null | awk '{print $2}')"
+    log_info "SSH pubkey: $SSH_FP"
+else
+    log_warn "SSH pubkey: not found"
+fi
+
+# /opt/stacks
+if [[ -d /opt/stacks ]]; then
+    log_info "/opt/stacks: exists (owned by $(stat -c '%U' /opt/stacks))"
+else
+    log_info "/opt/stacks: not created"
+fi
+
+# Display SSH public key for easy copy
 if [[ -f "$SSH_PUB" ]]; then
     log_step "SSH public key (add to GitHub → Settings → SSH Keys)"
     cat "$SSH_PUB"

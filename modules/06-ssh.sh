@@ -12,7 +12,7 @@ if [[ -f "$SSH_KEY" ]]; then
 else
     log_info "Generating ed25519 SSH keypair..."
     ensure_dir "$SSH_DIR"
-    ssh-keygen -t ed25519 -C "$TARGET_USER@$(hostname -s).lab.hoens.fun" -f "$SSH_KEY" -N ""
+    ssh-keygen -t ed25519 -C "$TARGET_USER@$(hostname -s).${LAB_DOMAIN}" -f "$SSH_KEY" -N ""
     log_success "SSH keypair generated"
 fi
 

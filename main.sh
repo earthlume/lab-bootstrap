@@ -46,10 +46,15 @@ if [[ "$EXPLICIT" == false ]] && [[ -t 0 ]]; then
 fi
 export TIER
 
+# --- Infrastructure configuration (override via env vars) ---
+export LAB_DOMAIN="${LAB_DOMAIN:-lab.example}"
+export LAB_SUBNET="${LAB_SUBNET:-}"
+export LAB_TIMEZONE="${LAB_TIMEZONE:-UTC}"
+
 # Error trap — report which module/line failed
 trap 'log_error "Bootstrap failed at line $LINENO in ${BASH_SOURCE[0]}"' ERR
 
-log_step "lab-bootstrap — lab.hoens.fun fleet provisioner"
+log_step "lab-bootstrap — ${LAB_DOMAIN} fleet provisioner"
 log_info "Host: $HOSTNAME_SHORT | Arch: $ARCH | OS: $OS_ID $OS_VERSION"
 log_info "Tier: $TIER"
 [[ "$IS_PI" == true ]] && log_info "Pi Model: $PI_MODEL"
@@ -57,13 +62,13 @@ log_info "Tier: $TIER"
 [[ "$IS_ARMV6" == true ]] && log_warn "ARMv6 detected — GitHub-hosted binaries will be skipped"
 [[ "$IS_LOW_RAM" == true ]] && log_warn "Low RAM detected (${TOTAL_RAM_MB} MB) — device has ≤512 MB"
 
-# Set timezone (entire fleet is in LA)
-log_info "Setting timezone to America/Los_Angeles"
-sudo timedatectl set-timezone America/Los_Angeles 2>/dev/null || log_warn "timedatectl not available — timezone not set"
+# Set timezone
+log_info "Setting timezone to ${LAB_TIMEZONE}"
+sudo timedatectl set-timezone "$LAB_TIMEZONE" 2>/dev/null || log_warn "timedatectl not available — timezone not set"
 
 for module in "$SCRIPT_DIR"/modules/[0-9]*.sh; do
     # Skip the dopamine module in work tier
-    if [[ "$TIER" == "work" ]] && [[ "$(basename "$module")" == "09-"* ]]; then
+    if [[ "$TIER" == "work" ]] && [[ "$(basename "$module")" == "10-"* ]]; then
         continue
     fi
     # shellcheck disable=SC1090

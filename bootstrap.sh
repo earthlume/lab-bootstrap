@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
 # bootstrap.sh — curl-pipe-sh entry point for lab-bootstrap
-# Usage: git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-bootstrap && bash ~/.local/share/lab-bootstrap/bootstrap.sh
+# Usage: curl -fsSL <raw-url>/bootstrap.sh | bash
+#   or:  git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-bootstrap && bash ~/.local/share/lab-bootstrap/bootstrap.sh
+# Clone auto-detects SSH vs HTTPS — SSH is used when GitHub SSH auth is available.
 set -euo pipefail
 
-REPO_URL="https://github.com/earthlume/lab-bootstrap.git"
+HTTPS_URL="https://github.com/earthlume/lab-bootstrap.git"
+SSH_URL="git@github.com:earthlume/lab-bootstrap.git"
 INSTALL_DIR="${HOME}/.local/share/lab-bootstrap"
 
-echo "[•] lab-bootstrap — lab.hoens.fun fleet provisioner"
+echo "[•] lab-bootstrap — fleet provisioner"
 
 # Ensure git is available
 if ! command -v git &>/dev/null; then
     echo "[•] Installing git..."
     sudo apt-get update -qq
     sudo apt-get install -y -qq git
+fi
+
+# Detect whether SSH authentication to GitHub is available
+if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    REPO_URL="$SSH_URL"
+    echo "[•] GitHub SSH access detected — using SSH clone URL"
+else
+    REPO_URL="$HTTPS_URL"
+    echo "[•] No GitHub SSH access — using HTTPS clone URL"
 fi
 
 # Clone or pull the repo

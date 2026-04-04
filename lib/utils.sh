@@ -52,6 +52,11 @@ deploy_template() {
     local owner="${3:-}"
     ensure_dir "$(dirname "$dest")"
     cp -f "$src" "$dest"
+    # Substitute infrastructure placeholders
+    sed -i \
+        -e "s|__LAB_DOMAIN__|${LAB_DOMAIN:-lab.example}|g" \
+        -e "s|__LAB_SUBNET__|${LAB_SUBNET:-}|g" \
+        "$dest"
     if [[ -n "$owner" ]]; then
         chown "$owner:$owner" "$dest"
     fi
