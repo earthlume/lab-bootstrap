@@ -17,11 +17,13 @@ export _LAB_MOTD_SHOWN=1
 T='\033[38;5;30m'
 R='\033[0m'
 
-printf "\n"
+# Strip trailing blank lines from everything — each tool adds its own
+# padding and the combined output gets too loose without this.
+_lab_motd_render() {
 
 # --- Figlet hostname banner (piped through lolcat if available) ---
 if command -v figlet &>/dev/null; then
-    BANNER="$(figlet -f small "$(hostname -s)" 2>/dev/null | sed -e :a -e '/[^[:space:]]/,$!d;/^$/{ $d; N; ba; }')"
+    BANNER="$(figlet -f small "$(hostname -s)" 2>/dev/null)"
     if [[ -n "$BANNER" ]] && command -v lolcat &>/dev/null; then
         echo "$BANNER" | lolcat -f 2>/dev/null
     elif [[ -n "$BANNER" ]]; then
@@ -38,7 +40,6 @@ else
     # Fall back to the base MOTD box
     MOTD_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     BASE_MOTD=""
-    # Try to find the base motd in common locations
     for path in "$MOTD_SCRIPT_DIR/motd" /etc/update-motd.d/99-lab-motd /etc/profile.d/99-lab-motd.sh; do
         if [[ -x "$path" ]] && [[ "$(basename "$path")" != "$(basename "${BASH_SOURCE[0]}")" ]]; then
             BASE_MOTD="$path"
@@ -61,3 +62,10 @@ if command -v fortune &>/dev/null && command -v cowsay &>/dev/null; then
         fi
     fi
 fi
+
+}
+
+# Render and strip trailing blank lines, then add exactly one
+_lab_motd_render | sed -e :a -e '/^\s*$/{ $d; N; ba; }'
+echo
+unset -f _lab_motd_render
