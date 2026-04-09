@@ -9,6 +9,11 @@
 if [[ -n "${_LAB_MOTD_SHOWN:-}" ]]; then return 0 2>/dev/null || exit 0; fi
 export _LAB_MOTD_SHOWN=1
 
+# Ensure tools are in PATH (profile.d runs before .zshrc sets up PATH)
+[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+[[ -d /usr/games ]] && export PATH="$PATH:/usr/games"
+[[ -d /usr/local/bin ]] && export PATH="$PATH:/usr/local/bin"
+
 T='\033[38;5;30m'
 R='\033[0m'
 
