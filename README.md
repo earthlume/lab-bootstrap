@@ -217,7 +217,7 @@ The bootstrapper uses environment variables for fleet-specific settings. All hav
 | `LAB_SUBNET` | *(empty)* | Preferred IP subnet for MOTD and `labip` alias (e.g. `10.4.20`). If unset, shows first non-loopback IP |
 | `LAB_TIMEZONE` | `UTC` | Timezone set during bootstrap (e.g. `America/Los_Angeles`) |
 | `LAB_MODE` | `fun` | Tier selection: `work` or `fun`. CLI flags `--work`/`--fun` override this |
-| `TARGET_USER` | `lume` | User account the bootstrap configures (set in `lib/utils.sh`) |
+| `TARGET_USER` | *(set in `lib/utils.sh`)* | User account the bootstrap configures — edit `lib/utils.sh` to match your username |
 
 Example: customize for your fleet:
 
