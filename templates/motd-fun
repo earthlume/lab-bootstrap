@@ -65,7 +65,6 @@ fi
 
 }
 
-# Render and strip trailing blank lines, then add exactly one
+# Render and strip all trailing blank lines
 _lab_motd_render | sed -e :a -e '/^\s*$/{ $d; N; ba; }'
-echo
 unset -f _lab_motd_render
