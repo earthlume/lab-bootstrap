@@ -3,11 +3,24 @@
 
 # ----- Powerlevel10k instant prompt (MUST be first) -----
 # Caches the prompt so it appears instantly while zsh finishes loading.
-# Disable on login shells so MOTD from profile.d displays cleanly.
+# Disable on login shells so MOTD displays cleanly.
 # Non-login shells (subshells, new tabs) still get instant prompt.
 [[ -o login ]] && typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# ----- MOTD (login shells only) -----
+# Source directly rather than relying on /etc/profile.d/ which ZSH
+# doesn't always pick up (e.g. Debian Trixie missing /etc/zsh/zprofile).
+if [[ -o login ]]; then
+    for _motd_script in /etc/profile.d/99-lab-motd{,.sh}; do
+        if [[ -x "$_motd_script" ]]; then
+            emulate bash -c "source '$_motd_script'"
+            break
+        fi
+    done
+    unset _motd_script
 fi
 
 # ----- Performance: cached compinit -----
