@@ -11,13 +11,13 @@ git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-boot
 bash ~/.local/share/lab-bootstrap/bootstrap.sh
 ```
 
-Then start a new shell:
+To re-run (e.g. after updates), just:
 
 ```bash
-exec zsh
+bash ~/.local/share/lab-bootstrap/bootstrap.sh
 ```
 
-That's it. Safe to re-run at any time.
+It pulls updates automatically and re-clones if the local copy has diverged.
 
 ### Work or Fun?
 
