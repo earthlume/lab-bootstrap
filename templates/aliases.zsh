@@ -80,8 +80,20 @@ alias apt-search='apt-cache search'
 
 # ----- Tool inventory -----
 _check() { command -v "$1" &>/dev/null && printf ' \033[32m✓\033[0m %-12s' "$1" || printf ' \033[31m✗\033[0m %-12s' "$1"; }
-alias work='echo "Work tier:"; _check eza; _check bat; _check rg; _check fd; _check fzf; _check zoxide; _check delta; _check dust; _check btop; _check duf; _check tldr; _check tmux; _check nvim; _check jq; _check tree; echo'
-alias fun='echo "Fun tier:"; _check figlet; _check lolcat; _check cowsay; _check fortune; _check cmatrix; _check cbonsai; _check tty-clock; _check sl; _check nyancat; _check pipes.sh; _check toilet; _check nms; _check tte; _check fastfetch; _check pfetch; echo'
+work() {
+    echo "Work tier:"
+    _check eza;    _check bat;    _check rg;     _check fd;   echo
+    _check fzf;    _check zoxide; _check delta;  _check dust; echo
+    _check btop;   _check duf;    _check tldr;   _check tmux; echo
+    _check nvim;   _check jq;     _check tree;                echo
+}
+fun() {
+    echo "Fun tier:"
+    _check figlet;    _check lolcat;    _check cowsay;   _check fortune; echo
+    _check cmatrix;   _check cbonsai;   _check tty-clock; _check sl;     echo
+    _check nyancat;   _check pipes.sh;  _check toilet;   _check nms;     echo
+    _check tte;       _check fastfetch; _check pfetch;                    echo
+}
 alias tools='work; echo; fun'
 
 # ----- Lab network -----
