@@ -5,6 +5,10 @@
 # Target: under 2 seconds total render on a Pi 5.
 # shellcheck disable=SC2059 — ANSI codes in format strings are intentional
 
+# Guard against double display (sourced by both profile.d and .zshrc)
+if [[ -n "${_LAB_MOTD_SHOWN:-}" ]]; then return 0 2>/dev/null || exit 0; fi
+export _LAB_MOTD_SHOWN=1
+
 T='\033[38;5;30m'
 R='\033[0m'
 

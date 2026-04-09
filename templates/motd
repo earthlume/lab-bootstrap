@@ -3,6 +3,10 @@
 # Generates live system info with teal-accented Unicode box drawing
 # shellcheck disable=SC2059 — ANSI codes in format strings are intentional
 
+# Guard against double display (sourced by both profile.d and .zshrc)
+if [[ -n "${_LAB_MOTD_SHOWN:-}" ]]; then return 0 2>/dev/null || exit 0; fi
+export _LAB_MOTD_SHOWN=1
+
 # Colors
 T='\033[38;5;30m'   # teal
 W='\033[1;37m'      # bright white
