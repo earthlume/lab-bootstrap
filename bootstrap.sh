@@ -19,7 +19,8 @@ if ! command -v git &>/dev/null; then
 fi
 
 # Detect whether SSH authentication to GitHub is available
-if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+# BatchMode=yes prevents password/passphrase prompts; ConnectTimeout caps the wait
+if ssh -o ConnectTimeout=5 -o BatchMode=yes -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
     REPO_URL="$SSH_URL"
     echo "[•] GitHub SSH access detected — using SSH clone URL"
 else
