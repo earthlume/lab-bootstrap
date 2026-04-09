@@ -4,20 +4,31 @@ Universal CLI bootstrapper for ADHD-INTP homelabbers — zsh, modern tools, dopa
 
 ## Quick Start
 
-On a freshly flashed Debian-based host where your provisioning user exists:
+### Fresh install
+
+On a freshly flashed Debian-based host (Ubuntu, Raspberry Pi OS, Debian):
 
 ```bash
+sudo apt-get update -qq && sudo apt-get install -y -qq git
 git clone https://github.com/earthlume/lab-bootstrap.git ~/.local/share/lab-bootstrap
 bash ~/.local/share/lab-bootstrap/bootstrap.sh
 ```
 
-To re-run (e.g. after updates), just:
+Then start a new shell:
+
+```bash
+exec zsh
+```
+
+### Update / re-run
+
+The bootstrapper is idempotent — safe to re-run at any time. It pulls the latest changes automatically:
 
 ```bash
 bash ~/.local/share/lab-bootstrap/bootstrap.sh
 ```
 
-It pulls updates automatically and re-clones if the local copy has diverged.
+If the local copy has diverged (e.g. after a force-push), it nukes and re-clones automatically. No manual cleanup needed.
 
 ### Work or Fun?
 
